@@ -1,0 +1,68 @@
+Verilog code:
+module carry_skip(output s, cout, input a, b, c0);
+  wire w0, w1, w2;
+  xor (w0, a, b);
+  xor (s, w0, c0);
+  and (w1, w0, c0);
+  and (w2, a, b);
+  or (cout, w1, w2);
+endmodule
+// Ripple Carry Adder - 4 bits
+module RCA4(output reg[3:0] s, output reg cout, input [3:0] a, b, input c0);
+  reg [3:1] c;
+    carry_skip fa0(s[0], c[1], a[0], b[0], c0);
+    carry_skip fa1(s[1], c[2], a[1], b[1], c[1]);
+    carry_skip fa2(s[2], c[3], a[2], b[2], c[2]);
+    carry_skip fa3(s[3], cout, a[3], b[3], c[3]);
+endmodule
+module SkipLogic(output c0_next, input [3:0] a, b, input c0, cout);
+  wire p0, p1, p2, p3, P, e;
+  or (p0, a[0], b[0]);
+  or (p1, a[1], b[1]);
+  or (p2, a[2], b[2]);
+  or (p3, a[3], b[3]);
+  and (P, p0, p1, p2, p3);
+  and (e, P, c0);
+  or (c0_next, e, cout);
+endmodule
+
+
+Testbench code:
+module skip_tb();
+  // Inputs
+  reg [3:0] a;
+  reg [3:0] b;
+  reg c0;
+  // Outputs
+  wire [3:0] s;
+  wire cout;
+  // Instantiate the module under test
+  SkipLogic dut(
+    .s(s),
+    .cout(cout),
+    .a(a),
+    .b(b),
+    .c0(c0)
+  );
+  // Stimulus
+  initial begin
+    // Initialize inputs
+    a = 4'b0000;
+    b = 4'b0000;
+    c0 = 0;
+    // Test case 1: Inputs all zeros
+    #10;
+    // Test case 2: Inputs all ones
+    a = 4'b1111;
+    b = 4'b1111;
+    c0 = 0;
+    #10;
+    
+    // Test case 3: Carry in set to 1
+    a = 4'b1010;
+    b = 4'b0110;
+    c0 = 1;
+    #10;
+    $finish;
+    end
+endmodule
