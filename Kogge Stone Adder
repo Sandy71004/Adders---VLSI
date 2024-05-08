@@ -1,0 +1,93 @@
+Verilog code:
+module ksa4(input [3:0]a,
+input [3:0]b,
+input cin,
+output [3:0]sum,
+output carryout);
+// Internal wires
+wire [3:0] p, g, cp, cg;
+wire [2:0] c;
+// Generate the Propagate (P) and Generate (G) bits using the "square" module
+square sq0(.a(a[0]), .b(b[0]), .p(p[0]), .g(g[0]));
+square sq1(.a(a[1]), .b(b[1]), .p(p[1]), .g(g[1]));
+square sq2(.a(a[2]), .b(b[2]), .p(p[2]), .g(g[2]));
+square sq3(.a(a[3]), .b(b[3]), .p(p[3]), .g(g[3]));
+// Generate the Carry Propagate (CP) and Carry Generate (CG) signals using the "big_circle" and "small_circle" modules
+big_circle bc0(.a(p[0]), .b(g[0]), .cin(cin), .p(cp[0]), .g(cg[0]));
+small_circle sc1(.a(p[1]), .b(g[1]), .cin(cp[0]), .p(cp[1]), .g(cg[1]));
+small_circle sc2(.a(p[2]), .b(g[2]), .cin(cp[1]), .p(cp[2]), .g(cg[2]));
+small_circle sc3(.a(p[3]), .b(g[3]), .cin(cp[2]), .p(cp[3]), .g(cg[3]));
+
+// Generate the Carry out (C) signals using the "triangle" module
+triangle tr1(.a(cp[0]), .b(g[1]), .cin(cin), .c(c[0]));
+triangle tr2(.a(cp[1]), .b(g[2]), .cin(cp[0]), .c(c[1]));
+triangle tr3(.a(cp[2]), .b(g[3]), .cin(cp[1]), .c(c[2]));
+// Generate the sum bits
+assign sum[0] = a[0] ^ b[0] ^ cin;
+assign sum[1] = a[1] ^ b[1] ^ c[0];
+assign sum[2] = a[2] ^ b[2] ^ c[1];
+assign sum[3] = a[3] ^ b[3] ^ c[2];
+// Generate the carry-out
+assign carryout = c[2];
+endmodule
+module square (
+    input a,
+    input b,
+    output p,
+    output g
+);
+assign p = a & b;
+assign g = a | b;
+endmodule
+module big_circle (
+    input a,
+    input b,
+    input cin,
+    output p,
+    output g);
+assign p = a | b | (a & b & cin);
+assign g = a & b | (a & cin) | (b & cin);
+
+endmodule
+module small_circle (
+    input a,
+    input b,
+    input cin,
+    output p,
+    output g);
+assign p = a | (b & cin);
+assign g = a & b;
+endmodule
+module triangle (
+    input a,
+    input b,
+    input cin,
+    output c);
+assign c = a | (b & cin);
+endmodule
+Testbench code:
+module ksatb;
+  reg [3:0] a;
+  reg [3:0] b;
+  reg cin;
+  // Outputs
+  wire [3:0] sum;
+  wire carryout;
+  // Instantiate the adder
+  ksa4 uut (
+    .a(a),
+    .b(b),
+    .cin(cin),
+    .sum(sum),
+    .carryout(carryout)
+  );
+  initial begin
+    // Test case 1
+     a = 4'b0000; b = 4'b0010; cin = 0;
+    #10;
+    // Test case 4
+    a = 4'b0011; b = 4'b0011; cin = 1;
+    #10;
+    $finish;
+  end
+endmodule
