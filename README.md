@@ -1,6 +1,7 @@
 # Adder Analysis in VLSI Using Xilinx Vivado
 
 This repository contains the implementation and analysis of various adder architectures in VLSI using Xilinx Vivado design software. The goal of this project is to compare different adder topologies based on parameters such as on-chip power consumption and delay, and to determine the most efficient adder for different applications.
+I have attached the bloack diagrams for below mentioned adders in this repository.
 
 ## Project Description
 
