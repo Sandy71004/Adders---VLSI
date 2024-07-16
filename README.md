@@ -30,9 +30,10 @@ Total Delay (ns): This is the sum of the logic delay and route delay, representi
 
 ## Comparison Table
 
-| S.No | Adder Types         | Utilization (%) | On-chip Power (W) | Delay (ns) |
-|------|---------------------|-----------------|-------------------|------------|
+| S.No | Adder Types         | Utilization (%) | On-chip Power (W) |         Delay (ns)       |
+|------|---------------------|-----------------|-------------------|--------------------------
 |      |                     | LUTs | IOs     |                   | Logic Delay | Route Delay |
+-----------------------------------------------------------------------------------------------
 | 1    | Carry Skip Adder    | 4    | 14      | 2.944             | 5.552       | 4.209       |
 | 2    | Carry Select Adder  | 1    | 14      | 2.61              | 5.339       | 2.545       |
 | 3    | Carry Lookahead Adder | 1  | 14      | 2.709             | 5.443       | 4.311       |
